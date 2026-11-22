@@ -119,7 +119,7 @@ function createCityCard(index) {
   if (location) {
     const result = conditionFor(location.current.weather_code);
     condition = result[0];
-    image.className = 'city-photo';
+
     button.setAttribute('aria-label', city.name + ': ' + condition + ', ' + temperature(location.current.temperature_2m) + '. Select to see details.');
   } else {
     button.setAttribute('aria-label', city.name + ': forecast not available yet. Select city.');
@@ -579,7 +579,7 @@ async function loadWeather() {
     const places = result;
     state.locations = places;
     state.forecastStatus = 'loaded';
-    state.errorMessage = '';
+
     if (state.selectedIndex >= places.length) {
       state.selectedIndex = 0;
     }
