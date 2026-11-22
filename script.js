@@ -214,7 +214,7 @@ function renderWeatherGallery() {
     });
     imageWrap.appendChild(zoomButton);
     const caption = makeElement('div', 'gallery-caption');
-    const badge = makeElement('span', 'gallery-live-badge', state.forecastStatus === 'loaded' ? 'Forecast loading' : 'Forecast unavailable');
+    const badge = makeElement('span', 'gallery-live-badge', state.forecastStatus === 'loading' ? 'Forecast loading' : 'Forecast unavailable');
     badge.setAttribute('data-gallery-city', String(photo.cityIndex));
     caption.appendChild(makeElement('h3', '', photo.label));
     caption.appendChild(makeElement('span', 'gallery-location', city.province));
