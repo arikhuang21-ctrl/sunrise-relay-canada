@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare today's weather, sunrise and sunset across five Canadian cities.">
+  <meta name="theme-color" content="#78A2D2">
+  <title>Sunrise Relay: Canada — CCT360 Project 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Charmonman:wght@400;700&family=Walter+Turncoat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="intro-overlay" id="introOverlay">
+    <section class="intro-note" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+      <button class="note-close" id="closeIntro" type="button" aria-label="Close welcome note">×</button>
+      <h2 id="introTitle">Welcome to Sunrise Relay</h2>
+      <p>Compare today’s weather and daylight across five Canadian cities. Forecasts use Open-Meteo; photos are representative views. Open through Live Server or GitHub Pages for live data.</p>
+      <button class="note-start" id="startExploring" type="button">Start exploring</button>
+    </section>
+  </div>
+  <a class="skip-link" href="#citiesTitle">Skip to city forecasts</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Sunrise Relay: Canada home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="15" r="6"/><path d="M16 2v3M16 25v4M3 15h3M26 15h3M6.8 5.8 9 8M23 22l2.2 2.2M25.2 5.8 23 8M9 22l-2.2 2.2M4 21h24"/></svg><span>Sunrise Relay</span></a>
+    <div class="header-project"><span>CCT360 · PROJECT 2</span><strong>Sunrise Relay: Canada</strong><span>Group 14 · Jiachen Huang &amp; Jun Ye</span></div>
+    <div class="header-actions"><span class="date-chip" id="dateLabel">Today</span><button class="refresh-button" id="refreshButton" type="button">Refresh Forecast</button></div>
+  </header>
+
+  <main id="top" class="page-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Where Morning<br><span>Finds You</span></h1>
+        <p class="hero-intro">Follow the day from the Pacific coast to central Canada. Each city has its own weather, first light, and forecast.</p>
+        <div class="hero-status"><span id="statusText" role="status">Checking forecast…</span></div>
+        <p id="connectionHelp" class="connection-help" hidden></p>
+      </div>
+      <div class="hero-image-wrap">
+        <img class="hero-image" src="assets/vancouver.jpg" alt="Vancouver skyline and harbour in the early morning" width="1200" height="800" fetchpriority="high" decoding="async">
+        <div class="hero-image-wash" aria-hidden="true"></div>
+        <div class="hero-image-caption"><span>Vancouver, British Columbia</span><a href="https://unsplash.com/photos/a-large-body-of-water-with-a-city-in-the-background-sASTuKKb1b4" target="_blank" rel="noreferrer">Photo by Matt Drenth</a></div>
+        <div class="sun-stamp" aria-hidden="true"><svg class="sun-stamp-icon" viewBox="0 0 32 32"><circle cx="16" cy="16" r="6"/><path d="M16 2v3M16 27v3M2 16h3M27 16h3M6 6l3 3M23 23l3 3M26 6l-3 3M9 23l-3 3"/></svg></div>
+      </div>
+    </section>
+
+    <section class="weather-gallery-section" aria-labelledby="galleryTitle">
+      <div class="gallery-heading">
+        <div><h2 id="galleryTitle">Canada, in a good light</h2><p>Representative photos; badges show current forecasts.</p></div>
+        <div class="gallery-controls" aria-label="Photo gallery controls">
+          <button id="galleryPrev" class="gallery-arrow" type="button" aria-label="Scroll to previous photos">←</button>
+          <button id="galleryNext" class="gallery-arrow" type="button" aria-label="Scroll to next photos">→</button>
+        </div>
+      </div>
+      <div id="weatherGallery" class="weather-gallery" tabindex="0" aria-label="Canadian city photo gallery"></div>
+    </section>
+
+    <section class="cities-section" aria-labelledby="citiesTitle">
+      <div class="section-heading">
+        <div><h2 id="citiesTitle">Choose a city</h2></div>
+        <div class="unit-switch" role="group" aria-label="Temperature units">
+          <button class="unit-button active" type="button" data-unit="C" aria-pressed="true" aria-label="Celsius">°C</button>
+          <button class="unit-button" type="button" data-unit="F" aria-pressed="false" aria-label="Fahrenheit">°F</button>
+        </div>
+      </div>
+      <div class="weather-filters" role="group" aria-label="Filter cities by current weather">
+        <button class="filter-button active" type="button" data-filter="all" aria-pressed="true">All Cities</button>
+        <button class="filter-button" type="button" data-filter="fog" aria-pressed="false">Fog</button>
+        <button class="filter-button" type="button" data-filter="snow" aria-pressed="false">Snow</button>
+        <button class="filter-button" type="button" data-filter="storm" aria-pressed="false">Storms</button>
+        <button class="filter-button" type="button" data-filter="clear" aria-pressed="false">Clear Dawn</button>
+        <span id="filterNote" class="filter-note" role="status" aria-live="polite"></span>
+      </div>
+      <div id="cityGrid" class="city-grid" aria-busy="false"></div>
+      <noscript><p class="forecast-error">Enable JavaScript to load forecast details. City photographs and sources are listed in the project README.</p></noscript>
+    </section>
+
+    <section id="cityDetail" class="detail-section" aria-labelledby="detailCity">
+      <div class="detail-main">
+        <div class="detail-weather">
+          <div class="detail-city-row"><h2 id="detailCity">Choose a city</h2><span id="conditionLabel" class="condition-label">Connecting…</span></div>
+          <div class="temperature-row"><strong id="temperatureValue"></strong><span id="weatherIcon" class="weather-icon" aria-hidden="true"></span></div>
+          <p id="weatherSummary" class="weather-summary"></p>
+          <div class="weather-facts"><span><small>High / low</small><strong id="highLow">—</strong></span><span><small>Wind</small><strong id="windValue">—</strong></span><span><small>Snow today</small><strong id="snowValue">—</strong></span><span><small>Precipitation chance</small><strong id="precipValue">—</strong></span></div>
+        </div>
+        <div class="sun-panel">
+          <div class="sun-panel-head"><div><h3>Today's daylight</h3></div><span id="daylightLength" class="daylight-length">— hours</span></div>
+          <div class="sun-journey">
+            <svg id="daylightCurve" class="daylight-curve" viewBox="0 0 400 180" role="img" aria-label="Daylight arc, waiting for forecast data">
+              <path class="daylight-arc-bed" d="M 25 150 Q 200 -75 375 150"/>
+              <path class="daylight-arc-line" d="M 25 150 Q 200 -75 375 150"/>
+              <circle id="sunPosition" class="sun-position" cx="25" cy="150" r="9"/>
+            </svg>
+            <div class="sun-times"><span class="sun-time-card"><small>Sunrise</small><strong id="sunriseValue">—</strong></span><span class="now-label" id="sunState">Local time</span><span class="sun-time-card"><small>Sunset</small><strong id="sunsetValue">—</strong></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="interpretation">
+      <span class="interpretation-rule" aria-hidden="true"></span>
+      <p>Forecasts are model estimates, not emergency alerts.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-project"><span class="footer-eyebrow">CCT360 · PROJECT 2</span><strong>Sunrise Relay: Canada</strong><span>Group 14 · Jiachen Huang &amp; Jun Ye</span></div>
+    <div class="footer-sources"><strong>Sources</strong><span>Weather: <a href="https://open-meteo.com/en/docs" target="_blank" rel="noreferrer">Open-Meteo</a> · <a href="https://open-meteo.com/en/licence" target="_blank" rel="noreferrer">Attribution</a></span><span>Photo credits link to each Unsplash source.</span></div>
+  </footer>
+  <div class="lightbox-overlay" id="lightboxOverlay" hidden>
+    <section class="lightbox-panel" role="dialog" aria-modal="true" aria-label="Expanded city photograph">
+      <button class="lightbox-close" id="closeLightbox" type="button" aria-label="Close expanded photograph">×</button>
+      <img id="lightboxImage" src="" alt="">
+      <p id="lightboxCaption"></p>
+    </section>
+  </div>
+</body>
+</html>
